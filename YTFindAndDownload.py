@@ -6,7 +6,7 @@
 #############################################################################
 from PyQt5.QtCore import (QFile, QStandardPaths, Qt, QProcess, QSettings)
 from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtWidgets import (QApplication, QFileDialog, QMainWindow, QLineEdit, 
+from PyQt5.QtWidgets import (QApplication, QFileDialog, QMainWindow, QLineEdit, QAction, 
                              QProgressBar, QTableWidget, QAbstractItemView, QDockWidget, 
                              QMessageBox, QHBoxLayout, QVBoxLayout, QWidget, QLabel, 
                              QPushButton, QComboBox, QTableWidgetItem)
@@ -63,8 +63,14 @@ class MainWindow(QMainWindow):
         lblFind.setFixedWidth(btnwidth)
         lblFind.setFont(QFont("Noto Sans", 9))
         lblFind.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        
+        ### search entry
         self.findField = QLineEdit("")
-        self.findField.addAction(QIcon.fromTheme("edit-find"), QLineEdit.LeadingPosition)
+        self.findField.addAction(QIcon.fromTheme("edit-find"), 0)
+        self.nextAction = QAction(QIcon.fromTheme("go-next"), None, None)
+        self.nextAction.setToolTip("next page")
+        self.nextAction.triggered.connect(self.searchNextPage)
+        self.findField.addAction(self.nextAction, 1)
         self.findField.setPlaceholderText("insert search term and press ENTER to get list of available movies")
         self.findField.returnPressed.connect(self.findItems)
 
@@ -237,8 +243,8 @@ class MainWindow(QMainWindow):
         self.lb.clearContents()
         self.lb.setRowCount(0)
         searchText = self.findField.text().replace(" ", "+")
-        videosSearch = VideosSearch(searchText)
-        res = videosSearch.result()
+        self.videosSearch = VideosSearch(searchText)
+        res = self.videosSearch.result()
         a = 0
         if res:
             for x in res['result']:
@@ -254,39 +260,28 @@ class MainWindow(QMainWindow):
                 a += 1
             for x in range(self.lb.rowCount()):
                 self.lb.resizeRowToContents(x)
-
-        videosSearch.next()
-        res = videosSearch.result()
-        if res:
-            for x in res['result']:
-                title = x["title"]
-                url = x["id"]
-                findList.append(url)
-                self.lb.insertRow(a)
-                t = QTableWidgetItem(title)
-                u = QTableWidgetItem(url)
-                self.lb.setItem(a, 0, t)
-                self.lb.setItem(a, 1, u)
-                a += 1
-            for x in range(self.lb.rowCount()):
-                self.lb.resizeRowToContents(x)  
-          
-        videosSearch.next()
-        res = videosSearch.result()
-        if res:
-            for x in res['result']:
-                title = x["title"]
-                url = x["id"]
-                findList.append(url)
-                self.lb.insertRow(a)
-                t = QTableWidgetItem(title)
-                u = QTableWidgetItem(url)
-                self.lb.setItem(a, 0, t)
-                self.lb.setItem(a, 1, u)
-                a += 1
-            for x in range(self.lb.rowCount()):
-                self.lb.resizeRowToContents(x)  
-
+                
+    def searchNextPage(self):
+        if self.lb.rowCount() > 0:
+            self.lb.clearContents()
+            self.lb.setRowCount(0)
+            self.videosSearch.next()
+            res = self.videosSearch.result()
+            a = 0
+            if res:
+                for x in res['result']:
+                    title = x["title"]
+                    url = x["id"]
+                    findList.append(url)
+                    self.lb.insertRow(a)
+                    t = QTableWidgetItem(title)
+                    u = QTableWidgetItem(url)
+                    self.lb.setItem(a, 0, t)
+                    self.lb.setItem(a, 1, u)
+                    a += 1
+                for x in range(self.lb.rowCount()):
+                    self.lb.resizeRowToContents(x)  
+                
     def closeEvent(self, e):
         self.writeSettings()
         e.accept()
