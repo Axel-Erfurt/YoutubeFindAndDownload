@@ -71,7 +71,10 @@ class MainWindow(QMainWindow):
         self.nextAction.setToolTip("next page")
         self.nextAction.triggered.connect(self.searchNextPage)
         self.findField.addAction(self.nextAction, 1)
-        self.findField.setPlaceholderText("insert search term and press ENTER to get list of available movies")
+        self.findField.setPlaceholderText("insert search term and press ENTER \
+                                           to get list of available movies")
+        self.findField.setToolTip("insert search term and press ENTER \
+                                    to get list of available movies")
         self.findField.returnPressed.connect(self.findItems)
 
         vlayout = QVBoxLayout()
@@ -79,19 +82,22 @@ class MainWindow(QMainWindow):
         vlayout.addWidget(self.findField)
         
         self.lb = QTableWidget()
+        self.lb.setGridStyle(1)
         self.lb.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.lb.setDragDropMode(QAbstractItemView.DragOnly)
-        self.lb.setToolTip("on selection change the Youtube ID is in clipboard\ndouble click to create list of available resolutions for  download")
+        self.lb.setToolTip("on selection change the Youtube ID is in clipboard\n\
+                            double click to create list of available resolutions for  download")
         self.lb.setColumnCount(3)
         self.lb.setColumnWidth(0, 420)
         self.lb.setColumnWidth(2, 88)
         self.lb.hideColumn(1)
-        #self.lb.setColumnWidth(1, 0)
+        self.lb.horizontalHeader().stretchLastSection()
         self.lb.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.lb.doubleClicked.connect(self.getItem)
         self.lb.itemSelectionChanged.connect(self.copyURL)
         self.lb.setHorizontalHeaderLabels(["Title", "ID", "Duration"])
         self.lb.setFixedHeight(380)
+        #self.lb.setFixedWidth(544)
         vlayout.addLayout(hlayout)
         vlayout.addWidget(self.lb)
 
@@ -150,7 +156,7 @@ class MainWindow(QMainWindow):
         self.dlCombo.setFixedHeight(26)
 
         self.pbar = QProgressBar()
-        self.pbar.setFixedHeight(16)
+        self.pbar.setFixedHeight(12)
         self.pbar.setFont(QFont("Helvetica", 7))
         self.pbar.setMaximum(100)
         self.pbar.setMinimum(0)
@@ -178,11 +184,13 @@ class MainWindow(QMainWindow):
         self.playerbox = QVBoxLayout()
         self.playerbox.addWidget(self.player)
         
-        self.dwid = QDockWidget("Player")
+        self.dwid = QDockWidget("  Player")
+        self.dwid.setStyleSheet("background: black")
         self.dwid.topLevelChanged.connect(self.makeFloating)
         self.dwid.setFeatures(QDockWidget.DockWidgetFloatable)
         self.dwid.setFixedSize(480, 320)
         self.pwid = QWidget()
+        self.pwid.setStyleSheet("background: black")
         self.pwid.setLayout(self.playerbox)
         self.dwid.setWidget(self.pwid)
         
@@ -198,6 +206,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("YouTube Find & Download")
         
     def makeFloating(self):
+        #return
         if self.dwid.isFloating() == False:
             self.dwid.setFixedSize(480, 320)
         else:
@@ -265,6 +274,7 @@ class MainWindow(QMainWindow):
                 a += 1
             for x in range(self.lb.rowCount()):
                 self.lb.resizeRowToContents(x)
+            self.lb.selectRow(0)
                 
     def searchNextPage(self):
         if self.lb.rowCount() > 0:
@@ -290,6 +300,7 @@ class MainWindow(QMainWindow):
                     a += 1
                 for x in range(self.lb.rowCount()):
                     self.lb.resizeRowToContents(x)  
+                self.lb.selectRow(0)
                 
     def closeEvent(self, e):
         self.writeSettings()
@@ -343,8 +354,9 @@ class MainWindow(QMainWindow):
 
     def copyURL(self):
         row = self.selectedRow()
-        item = self.lb.item(row, 1 ).text()
-        self.clip.setText(item)
+        if row:
+            item = self.lb.item(row, 1 ).text()
+            self.clip.setText(item)
 
     def selectedRow(self):
         if self.lb.selectionModel().hasSelection():
@@ -440,19 +452,19 @@ def myStyleSheet(self):
 
 QStatusBar
 {
-font-family: Helvetica;
-font-size: 8pt;
-color: #666666;
+    font-family: Helvetica;
+    font-size: 8pt;
+    color: #666666;
 }
 QMenuBar
 {
-background: transparent;
-border: 0px;
+    background: transparent;
+    border: 0px;
 }
 QToolBar
 {
-background: transparent;
-border: 0px;
+    background: transparent;
+    border: 0px;
 }
 QMainWindow
 {
@@ -462,25 +474,29 @@ QMainWindow
 }
 QTableWidget
 {
-     background: qlineargradient(y1: 0, y2: 1,
+    background: qlineargradient(y1: 0, y2: 1,
                                  stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
                                  stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+    color: #222222;
+    font-size: 9pt;
+    gridline-color: gray;
 }
+
+
 QHeaderView::section
 {
-background-color:#d3d7cf;
-color: #204a87; 
-font: bold
+    background-color:#d3d7cf;
+    color: #204a87; 
+    font: bold
 }
 QHeaderView
 {
      background: qlineargradient(y1: 0, y2: 1,
-                                 stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
-                                 stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+                                 stop: 0 #E1E1E1, stop: 1.0 #D3D3D3);
 }
 QTableCornerButton::section 
 {
-background-color:#d3d7cf; 
+    background-color:#d3d7cf; 
 }
 QLineEdit
 {
@@ -490,12 +506,24 @@ QLineEdit
 }
 QPushButton
 {
-background: #babdb6;
+    background: #babdb6;
 }
 QComboBox
 {
-background: #babdb6;
+    background: #babdb6;
 }
+QSlider::handle:horizontal 
+{
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #333, stop:1 #555555);
+    width: 14px;
+    border-radius: 0px;
+}
+    QSlider::groove:horizontal {
+    border: 1px solid #444;
+    height: 10px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #000, stop:1 #222222);
+}
+
     """    
 
 
