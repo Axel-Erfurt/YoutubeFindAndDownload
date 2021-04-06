@@ -1,21 +1,20 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Credits: searchyoutube made by LBLZR_ https://github.com/LaBlazer/searchyt - Apache License
-# ©2019 Axel Schneider https://github.com/Axel-Erfurt
+# Credits: youtube-search-python made by Hitesh Kumar Saini https://github.com/alexmercerind/youtube-search-python
+# MIT License
 #############################################################################
-from PyQt5.QtCore import (QFile, QPoint, QRect, QSize, QStandardPaths, 
-                                            Qt, QProcess, QSettings)
-from PyQt5.QtGui import QIcon, QFont, QClipboard
-from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QMainWindow, QLineEdit, 
+from PyQt5.QtCore import (QFile, QStandardPaths, Qt, QProcess, QSettings)
+from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtWidgets import (QApplication, QFileDialog, QMainWindow, QLineEdit, 
                              QProgressBar, QTableWidget, QAbstractItemView, QDockWidget, 
-            QMessageBox, QHBoxLayout, QVBoxLayout, QWidget, QLabel, QMessageBox, QPushButton, QComboBox, QTableWidgetItem)
+                             QMessageBox, QHBoxLayout, QVBoxLayout, QWidget, QLabel, 
+                             QPushButton, QComboBox, QTableWidgetItem)
             
-import searchyoutube
+from youtubesearchpython import VideosSearch
 import YTPlayer2 as YTPlayer
 
 
-syt = searchyoutube.searchyt()
 findList = []
 
 class MainWindow(QMainWindow):
@@ -237,25 +236,56 @@ class MainWindow(QMainWindow):
     def findItems(self):
         self.lb.clearContents()
         self.lb.setRowCount(0)
-        searchText = self.findField.text()
-        res = syt.search(searchText)
-        self.statusBar().showMessage("%s %s %s" % ("found:", len(res), "matches"), 0)
-        if len(res):
-            for x in range(len(res)):
-                #print(r)
-                title = res[x].get("title")
-                url = res[x].get("id")
-                #print("%s:\n%s\n%s" % (x + 1, title, url))
+        searchText = self.findField.text().replace(" ", "+")
+        videosSearch = VideosSearch(searchText)
+        res = videosSearch.result()
+        a = 0
+        if res:
+            for x in res['result']:
+                title = x["title"]
+                url = x["id"]
+                #print(title, url)
                 findList.append(url)
-                self.lb.insertRow(x)
+                self.lb.insertRow(a)
                 t = QTableWidgetItem(title)
                 u = QTableWidgetItem(url)
-                self.lb.setItem(x, 0, t)
-                self.lb.setItem(x, 1, u)
+                self.lb.setItem(a, 0, t)
+                self.lb.setItem(a, 1, u)
+                a += 1
             for x in range(self.lb.rowCount()):
                 self.lb.resizeRowToContents(x)
-        else:
-            self.statusBar().showMessage("nothing found", 0)
+
+        videosSearch.next()
+        res = videosSearch.result()
+        if res:
+            for x in res['result']:
+                title = x["title"]
+                url = x["id"]
+                findList.append(url)
+                self.lb.insertRow(a)
+                t = QTableWidgetItem(title)
+                u = QTableWidgetItem(url)
+                self.lb.setItem(a, 0, t)
+                self.lb.setItem(a, 1, u)
+                a += 1
+            for x in range(self.lb.rowCount()):
+                self.lb.resizeRowToContents(x)  
+          
+        videosSearch.next()
+        res = videosSearch.result()
+        if res:
+            for x in res['result']:
+                title = x["title"]
+                url = x["id"]
+                findList.append(url)
+                self.lb.insertRow(a)
+                t = QTableWidgetItem(title)
+                u = QTableWidgetItem(url)
+                self.lb.setItem(a, 0, t)
+                self.lb.setItem(a, 1, u)
+                a += 1
+            for x in range(self.lb.rowCount()):
+                self.lb.resizeRowToContents(x)  
 
     def closeEvent(self, e):
         self.writeSettings()
