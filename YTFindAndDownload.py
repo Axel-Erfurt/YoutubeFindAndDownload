@@ -82,14 +82,15 @@ class MainWindow(QMainWindow):
         self.lb.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.lb.setDragDropMode(QAbstractItemView.DragOnly)
         self.lb.setToolTip("on selection change the Youtube ID is in clipboard\ndouble click to create list of available resolutions for  download")
-        self.lb.setColumnCount(2)
-        self.lb.setColumnWidth(0, 540)
+        self.lb.setColumnCount(3)
+        self.lb.setColumnWidth(0, 420)
+        self.lb.setColumnWidth(2, 88)
         self.lb.hideColumn(1)
         #self.lb.setColumnWidth(1, 0)
         self.lb.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.lb.doubleClicked.connect(self.getItem)
         self.lb.itemSelectionChanged.connect(self.copyURL)
-        self.lb.setHorizontalHeaderLabels(["Title", "ID"])
+        self.lb.setHorizontalHeaderLabels(["Title", "ID", "Duration"])
         self.lb.setFixedHeight(380)
         vlayout.addLayout(hlayout)
         vlayout.addWidget(self.lb)
@@ -250,13 +251,17 @@ class MainWindow(QMainWindow):
             for x in res['result']:
                 title = x["title"]
                 url = x["id"]
+                duration = x["duration"]
                 #print(title, url)
                 findList.append(url)
                 self.lb.insertRow(a)
                 t = QTableWidgetItem(title)
                 u = QTableWidgetItem(url)
+                d = QTableWidgetItem(duration)
+                d.setTextAlignment(Qt.AlignRight)
                 self.lb.setItem(a, 0, t)
                 self.lb.setItem(a, 1, u)
+                self.lb.setItem(a, 2, d)
                 a += 1
             for x in range(self.lb.rowCount()):
                 self.lb.resizeRowToContents(x)
@@ -272,12 +277,16 @@ class MainWindow(QMainWindow):
                 for x in res['result']:
                     title = x["title"]
                     url = x["id"]
+                    duration = x["duration"]
                     findList.append(url)
                     self.lb.insertRow(a)
                     t = QTableWidgetItem(title)
                     u = QTableWidgetItem(url)
+                    d = QTableWidgetItem(duration)
+                    d.setTextAlignment(Qt.AlignRight)
                     self.lb.setItem(a, 0, t)
                     self.lb.setItem(a, 1, u)
+                    self.lb.setItem(a, 2, d)
                     a += 1
                 for x in range(self.lb.rowCount()):
                     self.lb.resizeRowToContents(x)  
