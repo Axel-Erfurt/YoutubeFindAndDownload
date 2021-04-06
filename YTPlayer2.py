@@ -19,8 +19,8 @@ class VideoPlayer(QWidget):
         super(VideoPlayer, self).__init__(parent)
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
-        self.mediaPlayer.mediaStatusChanged.connect(self.printMediaData)
-        self.mediaPlayer.setVolume(80)
+        #self.mediaPlayer.mediaStatusChanged.connect(self.printMediaData)
+        self.mediaPlayer.setVolume(100)
         self.videoWidget = QVideoWidget(self)
         
         self.lbl = QLineEdit('00:00:00')
@@ -181,7 +181,7 @@ def stylesheet(self):
 QLineEdit
 {
 background: transparent;
-color: #2e3436;
+color: #888a85;
 border: 0px;
 font-size: 8pt;
 font-weight: bold;
