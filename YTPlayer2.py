@@ -85,6 +85,7 @@ class VideoPlayer(QWidget):
         self.mediaPlayer.pause()
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.myurl)))
         self.playButton.setEnabled(True)
+        self.positionSlider.setValue(0)
         self.mediaPlayer.play()
         print(self.myurl)
 
