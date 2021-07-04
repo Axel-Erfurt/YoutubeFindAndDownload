@@ -74,7 +74,7 @@ class VideoPlayer(QWidget):
 
         self.mediaPlayer.setVideoOutput(self.videoWidget)
         self.mediaPlayer.stateChanged.connect(self.mediaStateChanged)
-        self.mediaPlayer.positionChanged.connect(self.positionChanged)
+        #self.mediaPlayer.positionChanged.connect(self.positionChanged)
         self.mediaPlayer.positionChanged.connect(self.handleLabel)
         self.mediaPlayer.durationChanged.connect(self.durationChanged)
         self.mediaPlayer.error.connect(self.handleError)
